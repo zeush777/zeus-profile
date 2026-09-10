@@ -16,8 +16,8 @@ const socialLinks = [
 ]
 
 const emailContacts = [
-  { label: 'Personal', email: 'zeushaitana911@gmail.com', service: 'Gmail', detail: 'zeushaitana911@gmail.com' },
-  { label: 'Work', email: 'zeush@missionreadyhq.com', service: 'Outlook', detail: 'zeush@missionreadyhq.com' },
+  { label: 'Personal', email: 'zeushaitana911@gmail.com', detail: 'zeushaitana911@gmail.com' },
+  { label: 'Work', email: 'zeush@missionreadyhq.com', detail: 'zeush@missionreadyhq.com' },
 ]
 
 const featuredProjects = [
@@ -64,6 +64,8 @@ function App() {
   const [isTeleporting, setIsTeleporting] = useState(false)
   const [activePage, setActivePage] = useState(() => window.location.hash.slice(1) || 'about')
   const [contactForm, setContactForm] = useState({ recipient: emailContacts[0].email, name: '', email: '', subject: '', message: '' })
+  const [contactStatus, setContactStatus] = useState({ type: '', message: '' })
+  const [isSending, setIsSending] = useState(false)
 
   function teleportToPage(event, pageId) {
     event.preventDefault()
@@ -81,16 +83,31 @@ function App() {
   function updateContactForm(event) {
     const { name, value } = event.target
     setContactForm((currentForm) => ({ ...currentForm, [name]: value }))
+    setContactStatus({ type: '', message: '' })
   }
 
-  function sendContactMessage(event) {
+  async function sendContactMessage(event) {
     event.preventDefault()
-    const body = `Name: ${contactForm.name}\nReply email: ${contactForm.email}\n\n${contactForm.message}`
-    const selectedContact = emailContacts.find((contact) => contact.email === contactForm.recipient)
-    const composeUrl = selectedContact?.service === 'Outlook'
-      ? `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(contactForm.recipient)}&subject=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(body)}`
-      : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contactForm.recipient)}&su=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(body)}`
-    window.open(composeUrl, '_blank', 'noopener,noreferrer')
+    setIsSending(true)
+    setContactStatus({ type: '', message: '' })
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      })
+      const result = await response.json()
+
+      if (!response.ok) throw new Error(result.error || 'The message could not be sent.')
+
+      setContactStatus({ type: 'success', message: 'Message sent directly to Zeus.' })
+      setContactForm((currentForm) => ({ ...currentForm, name: '', email: '', subject: '', message: '' }))
+    } catch (error) {
+      setContactStatus({ type: 'error', message: error.message })
+    } finally {
+      setIsSending(false)
+    }
   }
 
   return (
@@ -193,9 +210,9 @@ function App() {
         </div>
         <div className="link-list">
           {emailContacts.map((contact) => (
-            <a className="profile-link" href={contact.service === 'Outlook' ? `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(contact.email)}` : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}`} target="_blank" rel="noreferrer" key={contact.label}>
+            <a className="profile-link" href={`mailto:${contact.email}`} key={contact.label}>
               <span>{contact.label}</span>
-              <small>{contact.detail} · {contact.service}</small>
+              <small>{contact.detail}</small>
               <span aria-hidden="true">↗</span>
             </a>
           ))}
@@ -204,12 +221,12 @@ function App() {
       <form className="contact-form" onSubmit={sendContactMessage}>
         <div className="section-heading">
           <p className="overline">Write a message</p>
-          <p className="section-note">Opens your email client</p>
+          <p className="section-note">Sends directly to Zeus</p>
         </div>
         <label>
           Send to
           <select name="recipient" value={contactForm.recipient} onChange={updateContactForm}>
-            {emailContacts.map((contact) => <option value={contact.email} key={contact.label}>{contact.label} - {contact.service}</option>)}
+            {emailContacts.map((contact) => <option value={contact.email} key={contact.label}>{contact.label} - {contact.email}</option>)}
           </select>
         </label>
         <div className="contact-form-grid">
@@ -230,7 +247,10 @@ function App() {
           Message
           <textarea name="message" rows="6" value={contactForm.message} onChange={updateContactForm} required />
         </label>
-        <button className="contact-submit" type="submit">Open email draft <span aria-hidden="true">↗</span></button>
+        <button className="contact-submit" type="submit" disabled={isSending}>
+          {isSending ? 'Sending...' : 'Send message'} <span aria-hidden="true">↗</span>
+        </button>
+        {contactStatus.message && <p className={`contact-status ${contactStatus.type}`} role="status">{contactStatus.message}</p>}
       </form>
       </section>}
 

@@ -542,6 +542,25 @@ h1 {
 	transform: translateY(-2px);
 }
 
+.contact-submit:disabled {
+	opacity: 0.6;
+	cursor: wait;
+	transform: none;
+}
+
+.contact-status {
+	margin: 0;
+	font-size: 0.85rem;
+}
+
+.contact-status.success {
+	color: #356847;
+}
+
+.contact-status.error {
+	color: #9a3f39;
+}
+
 .experience-section {
 	padding: 56px 0 0;
 }
