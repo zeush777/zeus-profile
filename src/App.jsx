@@ -16,6 +16,7 @@ const socialLinks = [
 ]
 
 const emailContacts = [
+  { label: 'Personal', email: 'zeushaitana911@gmail.com', detail: 'zeushaitana911@gmail.com' },
   { label: 'Work', email: 'zeush@missionreadyhq.com', detail: 'zeush@missionreadyhq.com' },
 ]
 
@@ -62,9 +63,6 @@ function App() {
   const profile = defaultProfile
   const [isTeleporting, setIsTeleporting] = useState(false)
   const [activePage, setActivePage] = useState(() => window.location.hash.slice(1) || 'about')
-  const [contactForm, setContactForm] = useState({ recipient: emailContacts[0].email, name: '', email: '', subject: '', message: '' })
-  const [contactStatus, setContactStatus] = useState({ type: '', message: '' })
-  const [isSending, setIsSending] = useState(false)
 
   function teleportToPage(event, pageId) {
     event.preventDefault()
@@ -77,43 +75,6 @@ function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       setIsTeleporting(false)
     }, 1800)
-  }
-
-  function updateContactForm(event) {
-    const { name, value } = event.target
-    setContactForm((currentForm) => ({ ...currentForm, [name]: value }))
-    setContactStatus({ type: '', message: '' })
-  }
-
-  async function sendContactMessage(event) {
-    event.preventDefault()
-    setIsSending(true)
-    setContactStatus({ type: '', message: '' })
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactForm),
-      })
-      const responseText = await response.text()
-      let result = {}
-
-      try {
-        result = responseText ? JSON.parse(responseText) : {}
-      } catch {
-        throw new Error('The contact server is unavailable. Start the backend and try again.')
-      }
-
-      if (!response.ok) throw new Error(result.error || 'The message could not be sent.')
-
-      setContactStatus({ type: 'success', message: 'Message sent directly to Zeus.' })
-      setContactForm((currentForm) => ({ ...currentForm, name: '', email: '', subject: '', message: '' }))
-    } catch (error) {
-      setContactStatus({ type: 'error', message: error.message })
-    } finally {
-      setIsSending(false)
-    }
   }
 
   return (
@@ -210,7 +171,7 @@ function App() {
           ))}
         </div>
       </section>
-      <section className="profile-links email-links" aria-label="Email contacts">
+      <section className="profile-links email-links" aria-label="Email contact">
         <div className="section-heading">
           <p className="overline">Email</p>
         </div>
@@ -224,40 +185,6 @@ function App() {
           ))}
         </div>
       </section>
-      <form className="contact-form" onSubmit={sendContactMessage}>
-        <div className="section-heading">
-          <p className="overline">Write a message</p>
-          <p className="section-note">Sends directly to Zeus</p>
-        </div>
-        <label>
-          Send to
-          <select name="recipient" value={contactForm.recipient} onChange={updateContactForm}>
-            {emailContacts.map((contact) => <option value={contact.email} key={contact.label}>{contact.label} - {contact.email}</option>)}
-          </select>
-        </label>
-        <div className="contact-form-grid">
-          <label>
-            Your name
-            <input name="name" value={contactForm.name} onChange={updateContactForm} required />
-          </label>
-          <label>
-            Your email
-            <input name="email" type="email" value={contactForm.email} onChange={updateContactForm} required />
-          </label>
-        </div>
-        <label>
-          Subject
-          <input name="subject" value={contactForm.subject} onChange={updateContactForm} required />
-        </label>
-        <label>
-          Message
-          <textarea name="message" rows="6" value={contactForm.message} onChange={updateContactForm} required />
-        </label>
-        <button className="contact-submit" type="submit" disabled={isSending}>
-          {isSending ? 'Sending...' : 'Send message'} <span aria-hidden="true">↗</span>
-        </button>
-        {contactStatus.message && <p className={`contact-status ${contactStatus.type}`} role="status">{contactStatus.message}</p>}
-      </form>
       </section>}
 
       {activePage === 'projects' && <section className="subpage-view" aria-labelledby="projects-page-heading">
