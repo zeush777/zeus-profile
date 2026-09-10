@@ -16,7 +16,6 @@ const socialLinks = [
 ]
 
 const emailContacts = [
-  { label: 'Personal', email: 'zeushaitana911@gmail.com', detail: 'zeushaitana911@gmail.com' },
   { label: 'Work', email: 'zeush@missionreadyhq.com', detail: 'zeush@missionreadyhq.com' },
 ]
 
@@ -97,7 +96,14 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(contactForm),
       })
-      const result = await response.json()
+      const responseText = await response.text()
+      let result = {}
+
+      try {
+        result = responseText ? JSON.parse(responseText) : {}
+      } catch {
+        throw new Error('The contact server is unavailable. Start the backend and try again.')
+      }
 
       if (!response.ok) throw new Error(result.error || 'The message could not be sent.')
 
