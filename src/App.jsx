@@ -15,6 +15,11 @@ const socialLinks = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/zeus-haitana-4a22293bb/', detail: 'Professional profile' },
 ]
 
+const emailContacts = [
+  { label: 'Personal', email: 'zeushaitana911@gmail.com', service: 'Gmail', detail: 'zeushaitana911@gmail.com' },
+  { label: 'Work', email: 'zeush@missionreadyhq.com', service: 'Outlook', detail: 'zeush@missionreadyhq.com' },
+]
+
 const featuredProjects = [
   { name: 'Mission-Ready', href: 'https://github.com/zeush777/Mission-Ready', detail: 'Full-stack portfolio and project work' },
   { name: 'Turners-Project', href: 'https://github.com/zeush777/Turners-Project', detail: 'Insurance policy advisor application' },
@@ -58,6 +63,7 @@ function App() {
   const profile = defaultProfile
   const [isTeleporting, setIsTeleporting] = useState(false)
   const [activePage, setActivePage] = useState(() => window.location.hash.slice(1) || 'about')
+  const [contactForm, setContactForm] = useState({ recipient: emailContacts[0].email, name: '', email: '', subject: '', message: '' })
 
   function teleportToPage(event, pageId) {
     event.preventDefault()
@@ -70,6 +76,21 @@ function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       setIsTeleporting(false)
     }, 1800)
+  }
+
+  function updateContactForm(event) {
+    const { name, value } = event.target
+    setContactForm((currentForm) => ({ ...currentForm, [name]: value }))
+  }
+
+  function sendContactMessage(event) {
+    event.preventDefault()
+    const body = `Name: ${contactForm.name}\nReply email: ${contactForm.email}\n\n${contactForm.message}`
+    const selectedContact = emailContacts.find((contact) => contact.email === contactForm.recipient)
+    const composeUrl = selectedContact?.service === 'Outlook'
+      ? `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(contactForm.recipient)}&subject=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(body)}`
+      : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contactForm.recipient)}&su=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(body)}`
+    window.open(composeUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -166,6 +187,51 @@ function App() {
           ))}
         </div>
       </section>
+      <section className="profile-links email-links" aria-label="Email contacts">
+        <div className="section-heading">
+          <p className="overline">Email</p>
+        </div>
+        <div className="link-list">
+          {emailContacts.map((contact) => (
+            <a className="profile-link" href={contact.service === 'Outlook' ? `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(contact.email)}` : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}`} target="_blank" rel="noreferrer" key={contact.label}>
+              <span>{contact.label}</span>
+              <small>{contact.detail} · {contact.service}</small>
+              <span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+      </section>
+      <form className="contact-form" onSubmit={sendContactMessage}>
+        <div className="section-heading">
+          <p className="overline">Write a message</p>
+          <p className="section-note">Opens your email client</p>
+        </div>
+        <label>
+          Send to
+          <select name="recipient" value={contactForm.recipient} onChange={updateContactForm}>
+            {emailContacts.map((contact) => <option value={contact.email} key={contact.label}>{contact.label} - {contact.service}</option>)}
+          </select>
+        </label>
+        <div className="contact-form-grid">
+          <label>
+            Your name
+            <input name="name" value={contactForm.name} onChange={updateContactForm} required />
+          </label>
+          <label>
+            Your email
+            <input name="email" type="email" value={contactForm.email} onChange={updateContactForm} required />
+          </label>
+        </div>
+        <label>
+          Subject
+          <input name="subject" value={contactForm.subject} onChange={updateContactForm} required />
+        </label>
+        <label>
+          Message
+          <textarea name="message" rows="6" value={contactForm.message} onChange={updateContactForm} required />
+        </label>
+        <button className="contact-submit" type="submit">Open email draft <span aria-hidden="true">↗</span></button>
+      </form>
       </section>}
 
       {activePage === 'projects' && <section className="subpage-view" aria-labelledby="projects-page-heading">
