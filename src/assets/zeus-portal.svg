@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" role="img" aria-labelledby="title desc">
+  <title id="title">Zeus portal</title>
+  <desc id="desc">An original animated orbital portal with a dark center and magenta trails.</desc>
+  <rect width="768" height="768" fill="#05052d"/>
+  <g fill="#fff">
+    <circle cx="108" cy="148" r="3"/><circle cx="642" cy="116" r="4"/><circle cx="156" cy="614" r="3"/>
+    <circle cx="630" cy="622" r="2"/><circle cx="268" cy="74" r="3"/><circle cx="708" cy="378" r="2"/>
+  </g>
+  <g fill="none" stroke-linecap="round" transform="translate(384 384)">
+    <g opacity=".95" stroke="#ff3f9f" stroke-width="7">
+      <ellipse rx="270" ry="104" transform="rotate(-24)"><animateTransform attributeName="transform" type="rotate" from="-24" to="336" dur="7s" repeatCount="indefinite"/></ellipse>
+      <ellipse rx="248" ry="91" transform="rotate(28)"><animateTransform attributeName="transform" type="rotate" from="28" to="388" dur="6s" repeatCount="indefinite"/></ellipse>
+      <ellipse rx="218" ry="78" transform="rotate(-56)"><animateTransform attributeName="transform" type="rotate" from="-56" to="304" dur="5s" repeatCount="indefinite"/></ellipse>
+    </g>
+    <g opacity=".7" stroke="#ff9ecb" stroke-width="3">
+      <ellipse rx="302" ry="126" transform="rotate(12)"><animateTransform attributeName="transform" type="rotate" from="12" to="372" dur="9s" repeatCount="indefinite"/></ellipse>
+      <ellipse rx="188" ry="64" transform="rotate(62)"><animateTransform attributeName="transform" type="rotate" from="62" to="422" dur="4s" repeatCount="indefinite"/></ellipse>
+      <ellipse rx="154" ry="52" transform="rotate(-38)"><animateTransform attributeName="transform" type="rotate" from="-38" to="322" dur="3.5s" repeatCount="indefinite"/></ellipse>
+    </g>
+    <circle r="108" fill="#010106" stroke="#ff6aab" stroke-width="6"><animate attributeName="r" values="104;112;104" dur="3s" repeatCount="indefinite"/></circle>
+    <circle r="84" fill="#000"/>
+  </g>
+</svg>
